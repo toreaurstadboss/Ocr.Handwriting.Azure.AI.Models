@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
+@using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 @using Ocr.Handwriting.Azure.AI.Models;
 
 <h1>Azure AI OCR Text recognition</h1>
@@ -13,7 +15,9 @@
     <br />
     @if (PreviewImageUrl != null) { 
         <label class="alert-info">Preview of the selected image</label>
-        <img class="flagIcon" src="@PreviewImageUrl" /><br />
+        <div style="overflow:auto;max-height:300px;max-width:500px">
+            <img class="flagIcon" src="@PreviewImageUrl" /><br />
+        </div>
 
         <code class="alert-light">File Size (kB): @Model.FileSize</code>
 
@@ -39,23 +43,66 @@
     {
         Model.FilePath = args.File.Name;
         Model.FileSize = args.File.Size / 1024;
-        //var basePath = FileSystem.Current.AppDataDirectory;
-        //var fullPath = Path.Combine(basePath, Model.FilePath);
+        var basePath = FileSystem.Current.AppDataDirectory;
+        Model.SavedFilePath = Path.Combine(basePath, $"{Guid.NewGuid().ToString("N")}-{Model.FilePath}" );
 
-        await SaveImage(args);
+        var bytes = await SaveImage(args);
+        await File.WriteAllBytesAsync(Model.SavedFilePath, bytes);
+        await Application.Current.MainPage.DisplayAlert($"MAUI Blazor OCR App", $"Wrote file to location : {Model.SavedFilePath} Size is: {Model.FileSize / 1024} kB", "Ok", "Cancel");
     }
 
-    private async Task SaveImage(InputFileChangeEventArgs args){
+    private async Task<byte[]> SaveImage(InputFileChangeEventArgs args){
         IBrowserFile imgFile = args.File;
         var buffers = new byte[imgFile.Size];
         await imgFile.OpenReadStream(maxAllowedSize:30*1024*1024).ReadAsync(buffers);
         string imageType = imgFile.ContentType;
         PreviewImageUrl = $"data:{imageType};base64,{Convert.ToBase64String(buffers)}";
+        return buffers;
     }
 
     private async Task Submit(){
-        await Task.Delay(10);
-        StateHasChanged();
+        if (PreviewImageUrl == null || Model.SavedFilePath == null)
+        {
+            await Application.Current.MainPage.DisplayAlert($"MAUI Blazor OCR App", $"You must select an image first before running OCR. Supported formats are .jpeg, .jpg and .png", "Ok", "Cancel");
+            return;
+        }
+
+        // Add your Computer Vision key and endpoint
+        string key = Environment.GetEnvironmentVariable("AZURE_COGNITIVE_SERVICES_VISION_KEY");
+        string endpoint = Environment.GetEnvironmentVariable("AZURE_COGNITIVE_SERVICES_VISION_ENDPOINT");
+        ComputerVisionClient client = Authenticate(endpoint, key);
+
+        //Retrieve OCR results 
+
+        using (FileStream stream = File.OpenRead(Model.SavedFilePath))
+        {
+            var textHeaders = await client.ReadInStreamAsync(stream);
+            string operationLocation = textHeaders.OperationLocation;
+            string operationId = operationLocation[^36..]; //hat operator of C# 8.0 : this slices out the last 36 chars, which contains the guid chars which are 32 hexadecimals chars + four hyphens
+
+            ReadOperationResult results;
+
+            do
+            {
+                results = await client.GetReadResultAsync(Guid.Parse(operationId));
+            }
+            while ((results.Status == OperationStatusCodes.Running || results.Status == OperationStatusCodes.NotStarted));
+
+            ReadResult? result = results.AnalyzeResult.ReadResults.FirstOrDefault();
+
+            Model.OcrOutputText = ExtractText(result);
+        }
+
+        StateHasChanged(); //visual refresh here
     }
+
+    private static string ExtractText(ReadResult readResult) => string.Join(Environment.NewLine, readResult?.Lines?.Select(l => l.Text));
+
+    public static ComputerVisionClient Authenticate(string endpoint, string key) =>
+        new ComputerVisionClient(new ApiKeyServiceClientCredentials(key))
+            {
+                Endpoint = endpoint
+            };
+
 
 }

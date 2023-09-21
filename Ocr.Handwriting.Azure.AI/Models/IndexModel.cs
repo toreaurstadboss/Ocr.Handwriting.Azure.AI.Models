@@ -6,6 +6,7 @@
         public string FilePath { get; set; }
         public long FileSize { get; set; }
         public string OcrOutputText { get; set; }
+        public string SavedFilePath { get; set; }
     }
 
 }

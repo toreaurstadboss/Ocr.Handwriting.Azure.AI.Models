@@ -53,4 +53,8 @@
       <None Include="wwwroot\Js\app.js" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="7.0.1" />
+    </ItemGroup>
+
 </Project>
