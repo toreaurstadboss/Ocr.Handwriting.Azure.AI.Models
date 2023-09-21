@@ -1,17 +1,31 @@
 ﻿@page "/"
 @using Ocr.Handwriting.Azure.AI.Models;
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
+<h1>Azure AI OCR Text recognition</h1>
 
 
-<EditForm Model="Model" OnValidSubmit="@Submit">
+<EditForm Model="Model" OnValidSubmit="@Submit" style="background-color:aliceblue">
     <DataAnnotationsValidator />
+    <label><b>Select a picture to run OCR</b></label><br />
+    <InputFile OnChange="@OnInputFile" accept=".jpeg,.jpg,.png" />
+    <br />
+    <code class="alert-secondary">Supported file formats: .jpeg, .jpg and .png</code>
+    <br />
+    @if (PreviewImageUrl != null) { 
+        <label class="alert-info">Preview of the selected image</label>
+        <img class="flagIcon" src="@PreviewImageUrl" /><br />
 
-    <InputFile OnChange="@OnInputFile" />
+        <code class="alert-light">File Size (kB): @Model.FileSize</code>
+
+        <br />
+
+        <label class="alert-info">Click the button below to start running OCR using Azure AI</label><br />
+        <br />
+        <button type="submit">Submit</button>
+        <br />
+        <br />
+        <InputTextArea style="width:1000px;height:300px" readonly="readonly" placeholder="Detected text in the image uploaded" @bind-Value="Model!.OcrOutputText" rows="5"></InputTextArea>
+    }
 </EditForm>
 
 
@@ -19,13 +33,28 @@ Welcome to your new app.
 
     private IndexModel Model = new();
 
-    private void OnInputFile(InputFileChangeEventArgs args)
+    private string PreviewImageUrl = null;
+
+    private async Task OnInputFile(InputFileChangeEventArgs args)
     {
-        Model.FilePath = args.File.Name;   
+        Model.FilePath = args.File.Name;
+        Model.FileSize = args.File.Size / 1024;
+        //var basePath = FileSystem.Current.AppDataDirectory;
+        //var fullPath = Path.Combine(basePath, Model.FilePath);
+
+        await SaveImage(args);
     }
 
-    private async void Submit(){
+    private async Task SaveImage(InputFileChangeEventArgs args){
+        IBrowserFile imgFile = args.File;
+        var buffers = new byte[imgFile.Size];
+        await imgFile.OpenReadStream(maxAllowedSize:30*1024*1024).ReadAsync(buffers);
+        string imageType = imgFile.ContentType;
+        PreviewImageUrl = $"data:{imageType};base64,{Convert.ToBase64String(buffers)}";
+    }
 
+    private async Task Submit(){
+        await Task.Delay(10);
         StateHasChanged();
     }
 
