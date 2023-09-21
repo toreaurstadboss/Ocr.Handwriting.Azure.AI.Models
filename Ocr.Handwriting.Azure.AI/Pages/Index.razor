@@ -1,0 +1,32 @@
+﻿@page "/"
+@using Ocr.Handwriting.Azure.AI.Models;
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+
+<EditForm Model="Model" OnValidSubmit="@Submit">
+    <DataAnnotationsValidator />
+
+    <InputFile OnChange="@OnInputFile" />
+</EditForm>
+
+
+@code {
+
+    private IndexModel Model = new();
+
+    private void OnInputFile(InputFileChangeEventArgs args)
+    {
+        Model.FilePath = args.File.Name;   
+    }
+
+    private async void Submit(){
+
+        StateHasChanged();
+    }
+
+}
