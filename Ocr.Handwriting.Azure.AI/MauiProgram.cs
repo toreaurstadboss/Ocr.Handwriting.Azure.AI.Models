@@ -1,6 +1,7 @@
 ﻿using Ocr.Handwriting.Azure.AI.Data;
 using Ocr.Handwriting.Azure.AI.Lib;
 using Ocr.Handwriting.Azure.AI.Services;
+using TextCopy;
 
 namespace Ocr.Handwriting.Azure.AI;
 
@@ -25,6 +26,8 @@ public static class MauiProgram
 		builder.Services.AddScoped<IComputerVisionClientFactory, ComputerVisionClientFactory>();
         builder.Services.AddScoped<IOcrImageService, OcrImageService>();
 		builder.Services.AddScoped<IImageSaveService, ImageSaveService>();
+
+		builder.Services.InjectClipboard();
 
         return builder.Build();
 	}

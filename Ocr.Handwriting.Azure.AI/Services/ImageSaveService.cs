@@ -18,6 +18,8 @@ namespace Ocr.Handwriting.Azure.AI.Services
             {
                 SavedFilePath = Path.Combine(basePath, $"{Guid.NewGuid().ToString("N")}-{browserFile.Name}"),
                 PreviewImageUrl = $"data:{imageType};base64,{Convert.ToBase64String(buffers)}",
+                FilePath = browserFile.Name,
+                FileSize = bytes / 1024,
             };
 
             await File.WriteAllBytesAsync(imageSaveModel.SavedFilePath, buffers);
