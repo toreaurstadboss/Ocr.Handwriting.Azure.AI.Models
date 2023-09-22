@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Components.WebView.Maui;
-using Ocr.Handwriting.Azure.AI.Data;
+﻿using Ocr.Handwriting.Azure.AI.Data;
+using Ocr.Handwriting.Azure.AI.Lib;
+using Ocr.Handwriting.Azure.AI.Services;
 
 namespace Ocr.Handwriting.Azure.AI;
 
@@ -21,7 +22,10 @@ public static class MauiProgram
 #endif
 		
 		builder.Services.AddSingleton<WeatherForecastService>();
+		builder.Services.AddScoped<IComputerVisionClientFactory, ComputerVisionClientFactory>();
+        builder.Services.AddScoped<IOcrImageService, OcrImageService>();
+		builder.Services.AddScoped<IImageSaveService, ImageSaveService>();
 
-		return builder.Build();
+        return builder.Build();
 	}
 }

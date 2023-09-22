@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -11,9 +11,9 @@
     <SupportedPlatform Include="browser" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Azure.AI.FormRecognizer" Version="4.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.19" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="7.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.19" />
+	</ItemGroup>
 
 </Project>

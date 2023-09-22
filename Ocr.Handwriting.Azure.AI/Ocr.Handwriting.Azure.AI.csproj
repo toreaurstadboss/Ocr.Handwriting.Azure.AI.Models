@@ -57,4 +57,8 @@
       <PackageReference Include="Microsoft.Azure.CognitiveServices.Vision.ComputerVision" Version="7.0.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Ocr.Handwriting.Azure.Ai.Lib\Ocr.Handwriting.Azure.AI.Lib.csproj" />
+    </ItemGroup>
+
 </Project>

@@ -4,7 +4,7 @@ VisualStudioVersion = 17.0.31611.283
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ocr.Handwriting.Azure.AI", "Ocr.Handwriting.Azure.AI.csproj", "{81E525C7-8554-47E0-882D-972C05A9C239}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ocr.Handwriting.Azure.Ai.Lib", "..\Ocr.Handwriting.Azure.Ai.Lib\Ocr.Handwriting.Azure.Ai.Lib.csproj", "{FCE26C25-5C0B-412C-8263-57D612D96D42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ocr.Handwriting.Azure.AI.Lib", "..\Ocr.Handwriting.Azure.Ai.Lib\Ocr.Handwriting.Azure.AI.Lib.csproj", "{FCE26C25-5C0B-412C-8263-57D612D96D42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
